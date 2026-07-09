@@ -1,0 +1,25 @@
+<!--
+  ============================================================================
+  PAPILDOMAS BLOKAS – naudoti TIK Omnisend "Conditional Content" antroje
+  šakoje su taisykle: Cart Total >= 40 (arba currentCartValue >= 40).
+  Šis blokas pakeičia "NEMOKAMO PRISTATYMO JUOSTA" <tr> iš pagrindinio
+  failo checkout-abandonment-email-1.html, kai riba jau pasiekta.
+  Nenaudoja jokių {% if %} / {% assign %} blokų – tik statinis turinys.
+  ============================================================================
+-->
+<tr>
+  <td class="es-pad" style="padding:24px 40px 4px 40px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F6F2EC; border-radius:10px;">
+      <tr>
+        <td style="padding:20px 24px 22px 24px;">
+          <div style="font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:1.5; color:#5B6B4E; text-align:center; padding-bottom:12px;">
+            <span style="font-size:15px;">&#10003;</span>&nbsp; Puiku – Jūsų užsakymui taikomas <strong>nemokamas pristatymas</strong>
+          </div>
+          <div style="background-color:#E4DCCE; border-radius:100px; height:10px; width:100%; font-size:0; line-height:10px;">
+            <div style="background-color:#7C8A6A; border-radius:100px; height:10px; width:100%; font-size:0; line-height:10px;">&nbsp;</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
