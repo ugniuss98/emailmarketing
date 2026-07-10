@@ -1,0 +1,45 @@
+<!--
+  BLOKAS 1 / 6 – Logotipas + Hero nuotrauka
+  Įdėkite kaip PIRMĄ "Custom HTML" content bloką Omnisend redaktoriuje.
+  Šis blokas taip pat apibrėžia bendrus mobile CSS class'us (.es-*),
+  kuriuos naudoja ir kiti blokai – todėl turi likti pirmas.
+  Pakeiskite [OMNISEND_IMAGE_URL_HERO] į Omnisend įkeltos nuotraukos URL
+  (failas: "large JPG_RGB-LTEssentialsGroupImage2_MC_1.jpg").
+-->
+<style>
+  @media only screen and (max-width: 600px) {
+    .es-pad { padding-left:16px !important; padding-right:16px !important; }
+    .es-hero-wrap { padding-left:8px !important; padding-right:8px !important; }
+    .es-hero { height:190px !important; }
+    .es-h1 { font-size:24px !important; line-height:1.35 !important; }
+    .es-body { font-size:15px !important; line-height:1.85 !important; }
+    .es-cta-table { width:100% !important; }
+    .es-cta a { display:block !important; width:100% !important; box-sizing:border-box !important; padding:17px 20px !important; }
+    .es-col { display:block !important; width:100% !important; padding-left:0 !important; padding-right:0 !important; padding-bottom:16px !important; }
+    .es-brand { letter-spacing:3px !important; font-size:19px !important; }
+    .es-box { padding-left:16px !important; padding-right:16px !important; }
+  }
+</style>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px; margin:0 auto; background-color:#FFFFFF;">
+  <tr>
+    <td align="center" class="es-pad" style="padding:30px 24px 22px 24px;">
+      <div class="es-brand" style="font-family:Georgia,'Times New Roman',serif; font-size:23px; letter-spacing:5px; color:#2E2A26; text-transform:uppercase;">
+        Sentiment
+      </div>
+      <div style="font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:2.5px; color:#A38F7A; text-transform:uppercase; padding-top:8px;">
+        Oficialus Triumph &amp; Sloggi atstovas Lietuvoje
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td class="es-hero-wrap" style="padding:0 28px 4px 28px;">
+      <!--[if mso]>
+      <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:544px;height:170px;">
+        <v:fill type="frame" src="[OMNISEND_IMAGE_URL_HERO]" color="#ECE6DE" />
+        <v:textbox inset="0,0,0,0"><![endif]-->
+      <div class="es-hero" style="background-image:url('[OMNISEND_IMAGE_URL_HERO]'); background-position:center 32%; background-repeat:no-repeat; background-size:cover; width:100%; height:170px; border-radius:10px; line-height:170px; font-size:0;">&nbsp;</div>
+      <!--[if mso]></v:textbox></v:rect><![endif]-->
+    </td>
+  </tr>
+</table>

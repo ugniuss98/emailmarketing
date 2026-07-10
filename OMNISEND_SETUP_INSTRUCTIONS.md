@@ -1,54 +1,112 @@
-# Omnisend Email Setup Instructions
+# Omnisend Setup Instructions — Checkout Abandonment Email #1
 
-## Checkout Abandonment Email #1
+## Kodėl blokais, o ne vienu HTML?
 
-### 1. Nuotraukų įkėlimas
-1. Prisijunkite prie Omnisend'o
-2. Eikite į **Media Library** → **Upload**
-3. Įkelkite failą: `large JPG_RGB-LTEssentialsGroupImage2_MC_1.jpg`
-4. Omnisend suteiks URL, pvz.: `https://cdn.omnisend.com/...`
-5. Nukopijuokite šį URL
+Omnisend canvas turi fiksuotą plotį (matote "Canvas width: 600" nustatymuose).
+Vienas didelis HTML failas su savo fiksuotu 600px stalu + papildomu
+paminkštinimu aplink jį pridėdavo papildomus pikselius ir turinys išlįsdavo
+už canvas ribų (tiek desktop, tiek mobile peržiūroje). Kiekvienas blokas dabar
+yra **fluid** (width:100%, be išorinio wrapper'io) — jis tiksliai atsitaiso
+pagal canvas plotį, jokio persidengimo.
 
-### 2. HTML šablono paruošimas
-1. Atidarykite `checkout-abandonment-email-1.html`
-2. Raskite: `[OMNISEND_IMAGE_URL_HERO]`
-3. Pakeiskite jį gautuu Omnisend CDN URL
+Taip pat išskaidymas leidžia tarp blokų įterpti **Omnisend natūralų
+"Products" elementą** (matomas kairėje bibliotekoje, po "Content" →
+"Products", pažymėtas žvaigždute), kuris automatiškai užpildo REALIAS
+krepšelyje paliktas prekes — vietoj rankomis parašyto mockup.
 
-### 3. Dinaminiai blokai (Omnisend merge tags)
+## Surinkimo eiliškumas Omnisend redaktoriuje
 
-| Vieta | Ką daryti |
-|------|----------|
-| `{{firstName}}` | Automatinis klientės vardas (jei ne – rodys "malonu Jus matyti") |
-| `{{abandonedCheckoutUrl}}` | Automatiška nuoroda į nebaigtą krepšelį |
-| `{{unsubscribeUrl}}` | Automatiška atsisakymo nuoroda |
+Kiekvieną `.html` failą įdėkite kaip atskirą **"Custom HTML" content
+bloką** (Content → HTML), tiksliai šia tvarka:
 
-### 4. Krepšelio prekės (SVARBU)
-**Šablone** yra maketo pavyzdys su `{{product.title}}` ir `{{product.price}}`.
+1. **`checkout-abandonment-email-1-block-1-header-hero.html`**
+   Logotipas + hero nuotrauka. ŠIS BLOKAS TURI BŪTI PIRMAS — jame apibrėžti
+   bendri mobile CSS class'ai (`.es-pad`, `.es-h1` ir t.t.), kuriuos naudoja
+   ir kiti blokai.
+   → Pakeiskite `[OMNISEND_IMAGE_URL_HERO]` į Omnisend įkeltos nuotraukos URL
+   (failas: `large JPG_RGB-LTEssentialsGroupImage2_MC_1.jpg`).
 
-**Omnisend'e** turėtumėte:
-1. Raskite komentarą `<!-- MAKETO PAVYZDYS – Omnisend... -->`
-2. Pakeiskite jį **Omnisend "Abandoned Checkout Products" bloku** – tai rodys faktines prekes iš nebaigtai sesijos
-3. Arba naudokite Omnisend'o *Email Block* → *Products from abandoned checkout*
+2. **`checkout-abandonment-email-1-block-2-intro.html`**
+   Antraštė „Jūsų prekės vis dar laukia" + įžanginis tekstas.
 
-### 5. Finalizavimas
-✓ Visas tekstas jau lietuvių kalba  
-✓ Nėra "buy now" agresyvumo (1-o laiškas)  
-✓ Dydžių gidas prilinkotas  
-✓ CTA aiškus: "Užbaigti užsakymą"  
-✓ Patikimumo argumentai įtraukti  
+3. **Nemokamo pristatymo juosta – DVI ALTERNATYVOS per Conditional Content:**
+   Pridėkite Omnisend **"Conditional Content"** bloką su taisykle pagal
+   jūsų automation event lauką `event.value` (tai jūsų event'e yra
+   krepšelio suma):
+   - Šaka **event.value < 40** → įdėkite
+     `checkout-abandonment-email-1-block-3a-freeshipping-remaining.html`
+   - Šaka **event.value >= 40** → įdėkite
+     `checkout-abandonment-email-1-block-3b-freeshipping-achieved.html`
 
----
+4. **Krepšelio prekės:**
+   Jūsų event'e prekių laukai (`event.lineItems[0].productTitle`,
+   `productImageURL`, `productURL`, `productSKU`, `productDiscount`,
+   `productStrikeThroughPrice`, `productVariantID` ir t.t.) yra pasiekiami
+   TIK per fiksuotą indeksą `lineItems[0]` — tai reiškia, kad ranka rašytas
+   HTML su šiais laukais parodys **tik pirmą** krepšelio prekę, ne visas.
+   ⚠️ Jei norite, kad automatiškai rodytųsi VISOS krepšelio prekės (kai jų
+   daugiau nei viena), naudokite Omnisend natūralų **"Products"** elementą
+   (kairėje bibliotekoje, po "Content" → "Products", pažymėtas žvaigždute)
+   — jis susieja su abandoned checkout eventu ir kartojasi kiekvienai
+   prekei automatiškai. Custom HTML su `lineItems[0]` tinka tik jei
+   žinote, kad krepšelyje visada yra 1 prekė, arba norite rodyti tik
+   pirmąją prekę kaip akcentą.
 
-## Pastabos
+5. **`checkout-abandonment-email-1-block-4-cta-sizeguide.html`**
+   CTA mygtukas „Užbaigti užsakymą" + nuoroda į dydžių gidą.
 
-- **Šriftai**: HTML naudoja serif (Georgia) ir sans-serif (Helvetica/Arial) dėl email kliento suderinamumo. The Seasons / Gilroy gali būti tik mockup'ams.
-- **Fono spalva**: `#EFEAE3` (švelnias kreminis tonas per brand'ą)
-- **Tekstas**: Šiltas, elegantiškas, be spaudimo – pasitikėjimo fokusas
+6. **`checkout-abandonment-email-1-block-5-trust.html`**
+   „Kodėl verta rinktis Sentiment" – 6 patikimumo argumentai.
 
----
+7. **Poraštė – rekomenduojame Omnisend natūralų "Footer" elementą**
+   (kairėje bibliotekoje, po "Content"), nes jis automatiškai sutvarko
+   Unsubscribe/Preferences nuorodas pagal teisinius reikalavimus.
+   Jei norite pilnai custom dizaino vietoj to — naudokite
+   `checkout-abandonment-email-1-block-6-footer.html`.
 
-## Nuotrauka šaltinis
-- Failas iš repo: `large JPG_RGB-LTEssentialsGroupImage2_MC_1.jpg`
-- 3 moterys, maudymosi / namų drabužio tema
-- Puikiai atitinka Triumph + Sentiment brand'o vizualinį stilių
+## Merge tag'ai
 
+Yra DVI skirtingos sintaksės, priklausomai nuo lauko tipo:
+
+**Kontakto lygio laukai** — naudoja `{{ }}`:
+
+| Tag | Reikšmė |
+|---|---|
+| `{{ firstName }}` | Kontakto vardas |
+| `{{ unsubscribeUrl }}` | Atsisakymo nuoroda |
+
+**Jūsų automation event laukai** — naudoja `[[event.field]]` (pagal jūsų
+rastą lauko sąrašą):
+
+| Tag | Reikšmė |
+|---|---|
+| `[[event.value]]` | Krepšelio suma |
+| `[[event.abandonedCheckoutURL]]` | Nuoroda atgal į checkout |
+| `[[event.cartID]]` | Krepšelio ID |
+| `[[event.lineItems[0].productTitle]]` | Pirmos prekės pavadinimas |
+| `[[event.lineItems[0].productImageURL]]` | Pirmos prekės nuotrauka |
+| `[[event.lineItems[0].productURL]]` | Nuoroda į pirmą prekę |
+| `[[event.lineItems[0].productSKU]]` | Pirmos prekės SKU |
+| `[[event.lineItems[0].productDiscount]]` | Nuolaida |
+| `[[event.lineItems[0].productStrikeThroughPrice]]` | Kaina prieš nuolaidą |
+| `[[event.lineItems[0].productVariantID]]` | Varianto ID |
+| `[[event.lineItems[0].productVariantImageURL]]` | Varianto nuotrauka |
+
+Visada pridėkite `|default:"..."` (kaip jūs jau darėte), kad tuščias laukas
+netaptų matomas kaip klaida.
+
+## Testavimas
+
+Redaktoriaus canvas NEAPDOROJA merge tag'ų (matysite juos kaip raidinį
+tekstą `{{ ... }}` arba `[[ ... ]]`) — tai normalu. Norėdami pamatyti
+realias reikšmes, naudokite viršuje esantį **"Preview & test"** mygtuką
+arba išsisiųskite testinį laišką sau.
+
+## Nemokamo pristatymo skaičiavimas
+
+`[[40 | minus: event.value | at_least: 0 | round: 2 | default: "0"]]` —
+apskaičiuoja, kiek liko iki 40 € ribos, apkerpant neigiamas reikšmes iki 0.
+`[[event.value | times: 2.5 | at_least: 0 | at_most: 100 | default: "0"]]`
+— juostos užpildymo procentas (100 / 40 = 2.5), apkarpytas 0–100 ribose.
+Jei filtras `at_most` nepalaikomas, juostos konteineryje yra
+`overflow:hidden` apsauga, kad procentas vizualiai neišlįstų.
