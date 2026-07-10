@@ -31,18 +31,26 @@ bloką** (Content → HTML), tiksliai šia tvarka:
 
 3. **Nemokamo pristatymo juosta – DVI ALTERNATYVOS per Conditional Content:**
    Pridėkite Omnisend **"Conditional Content"** bloką su taisykle pagal
-   `Cart Total`:
-   - Šaka **Cart Total < 40** → įdėkite
+   jūsų automation event lauką `event.value` (tai jūsų event'e yra
+   krepšelio suma):
+   - Šaka **event.value < 40** → įdėkite
      `checkout-abandonment-email-1-block-3a-freeshipping-remaining.html`
-   - Šaka **Cart Total >= 40** → įdėkite
+   - Šaka **event.value >= 40** → įdėkite
      `checkout-abandonment-email-1-block-3b-freeshipping-achieved.html`
 
-4. **Krepšelio prekės – NAUDOKITE OMNISEND NATŪRALŲ ELEMENTĄ:**
-   Kairėje bibliotekoje eikite į **Products** (žvaigždutės ikona) ir
-   įtempkite jį čia. Jis automatiškai susies su abandoned checkout eventu ir
-   parodys realias krepšelyje esančias prekes (nuotrauka, pavadinimas,
-   kiekis, kaina) — kartosis kiekvienai prekei automatiškai, nereikia jokio
-   rankinio HTML.
+4. **Krepšelio prekės:**
+   Jūsų event'e prekių laukai (`event.lineItems[0].productTitle`,
+   `productImageURL`, `productURL`, `productSKU`, `productDiscount`,
+   `productStrikeThroughPrice`, `productVariantID` ir t.t.) yra pasiekiami
+   TIK per fiksuotą indeksą `lineItems[0]` — tai reiškia, kad ranka rašytas
+   HTML su šiais laukais parodys **tik pirmą** krepšelio prekę, ne visas.
+   ⚠️ Jei norite, kad automatiškai rodytųsi VISOS krepšelio prekės (kai jų
+   daugiau nei viena), naudokite Omnisend natūralų **"Products"** elementą
+   (kairėje bibliotekoje, po "Content" → "Products", pažymėtas žvaigždute)
+   — jis susieja su abandoned checkout eventu ir kartojasi kiekvienai
+   prekei automatiškai. Custom HTML su `lineItems[0]` tinka tik jei
+   žinote, kad krepšelyje visada yra 1 prekė, arba norite rodyti tik
+   pirmąją prekę kaip akcentą.
 
 5. **`checkout-abandonment-email-1-block-4-cta-sizeguide.html`**
    CTA mygtukas „Užbaigti užsakymą" + nuoroda į dydžių gidą.
@@ -56,28 +64,49 @@ bloką** (Content → HTML), tiksliai šia tvarka:
    Jei norite pilnai custom dizaino vietoj to — naudokite
    `checkout-abandonment-email-1-block-6-footer.html`.
 
-## Merge tag'ai (patikrinti Omnisend Abandoned Checkout evente)
+## Merge tag'ai
+
+Yra DVI skirtingos sintaksės, priklausomai nuo lauko tipo:
+
+**Kontakto lygio laukai** — naudoja `{{ }}`:
 
 | Tag | Reikšmė |
 |---|---|
 | `{{ firstName }}` | Kontakto vardas |
-| `{{ cartTotal }}` | Krepšelio suma |
-| `{{ checkoutUrl }}` | Nuoroda atgal į checkout |
-| `{{ currency }}` | Valiuta |
 | `{{ unsubscribeUrl }}` | Atsisakymo nuoroda |
+
+**Jūsų automation event laukai** — naudoja `[[event.field]]` (pagal jūsų
+rastą lauko sąrašą):
+
+| Tag | Reikšmė |
+|---|---|
+| `[[event.value]]` | Krepšelio suma |
+| `[[event.abandonedCheckoutURL]]` | Nuoroda atgal į checkout |
+| `[[event.cartID]]` | Krepšelio ID |
+| `[[event.lineItems[0].productTitle]]` | Pirmos prekės pavadinimas |
+| `[[event.lineItems[0].productImageURL]]` | Pirmos prekės nuotrauka |
+| `[[event.lineItems[0].productURL]]` | Nuoroda į pirmą prekę |
+| `[[event.lineItems[0].productSKU]]` | Pirmos prekės SKU |
+| `[[event.lineItems[0].productDiscount]]` | Nuolaida |
+| `[[event.lineItems[0].productStrikeThroughPrice]]` | Kaina prieš nuolaidą |
+| `[[event.lineItems[0].productVariantID]]` | Varianto ID |
+| `[[event.lineItems[0].productVariantImageURL]]` | Varianto nuotrauka |
+
+Visada pridėkite `|default:"..."` (kaip jūs jau darėte), kad tuščias laukas
+netaptų matomas kaip klaida.
 
 ## Testavimas
 
 Redaktoriaus canvas NEAPDOROJA merge tag'ų (matysite juos kaip raidinį
-tekstą `{{ ... }}`) — tai normalu. Norėdami pamatyti realias reikšmes,
-naudokite viršuje esantį **"Preview & test"** mygtuką arba išsisiųskite
-testinį laišką sau.
+tekstą `{{ ... }}` arba `[[ ... ]]`) — tai normalu. Norėdami pamatyti
+realias reikšmes, naudokite viršuje esantį **"Preview & test"** mygtuką
+arba išsisiųskite testinį laišką sau.
 
 ## Nemokamo pristatymo skaičiavimas
 
-`{{ 40 | minus: cartTotal | at_least: 0 | round: 2 }}` — apskaičiuoja, kiek
-liko iki 40 € ribos, apkerpant neigiamas reikšmes iki 0.
-`{{ cartTotal | times: 2.5 | at_least: 0 | at_most: 100 }}` — juostos
-užpildymo procentas (100 / 40 = 2.5), apkarpytas 0–100 ribose.
+`[[40 | minus: event.value | at_least: 0 | round: 2 | default: "0"]]` —
+apskaičiuoja, kiek liko iki 40 € ribos, apkerpant neigiamas reikšmes iki 0.
+`[[event.value | times: 2.5 | at_least: 0 | at_most: 100 | default: "0"]]`
+— juostos užpildymo procentas (100 / 40 = 2.5), apkarpytas 0–100 ribose.
 Jei filtras `at_most` nepalaikomas, juostos konteineryje yra
 `overflow:hidden` apsauga, kad procentas vizualiai neišlįstų.
